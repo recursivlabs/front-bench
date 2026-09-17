@@ -6,9 +6,10 @@ IID="$1"; cd "$(dirname "$0")/.." || exit 2
 SPEC=$(node -e "const b=require('./bench/instances.json').find(x=>x.iid==='$IID');process.stdout.write(b?b.spec:'')")
 FIX=$(node -e "const b=require('./bench/instances.json').find(x=>x.iid==='$IID');process.stdout.write(b?b.fix_commit:'')")
 test -n "$SPEC" || { echo "unknown bug $IID"; exit 2; }
-if [ ! -f .bench-spec-$IID ]; then
-  git fetch -q --depth 1 https://github.com/Minds/front.git "$FIX" && git checkout -q FETCH_HEAD -- "$SPEC" && touch .bench-spec-$IID
-fi
+# The oracle spec comes from the human fix commit for the run only; the working tree copy is restored after.
+git fetch -q --depth 1 https://github.com/Minds/front.git "$FIX" && git show FETCH_HEAD:"$SPEC" > .bench-oracle-spec.ts
+cp "$SPEC" .bench-spec-backup.ts; cp .bench-oracle-spec.ts "$SPEC"
+trap 'cp .bench-spec-backup.ts "$SPEC"; rm -f .bench-spec-backup.ts .bench-oracle-spec.ts' EXIT
 CHROME="${CHROME_BIN:-$(command -v chromium || command -v chromium-browser || command -v google-chrome || echo '')}"
 CHROME_BIN="$CHROME" npx ng test --watch=false --browsers=ChromeHeadlessCI --source-map=false --include="$SPEC" > .bench-last.log 2>&1
 CODE=$?
