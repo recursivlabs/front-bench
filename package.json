@@ -181,5 +181,8 @@
     "Firefox ESR",
     "not dead",
     "not IE 11"
-  ]
+  ],
+  "overrides": {
+    "micro-bip32": "file:bench/vendor/scure-bip32-1.7.0.tgz"
+  }
 }
