@@ -1,0 +1,38 @@
+name: bench-spec
+# The grade for one bug-bench run. The branch name carries the bug: bench/<iid>/<anything>.
+# The job checks out the PR head, takes the bug's spec from the human fix commit (the oracle),
+# and runs only that spec. Green means the fix passes the team's own test. Nothing else is judged here.
+on:
+  pull_request:
+
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Resolve the bug from the branch name
+        id: bug
+        run: |
+          IID=$(echo "${GITHUB_HEAD_REF}" | sed -n 's#^bench/\([0-9]*\)/.*#\1#p')
+          test -n "$IID" || { echo "branch must be bench/<iid>/<run>"; exit 1; }
+          SPEC=$(node -e "const b=require('./bench/instances.json').find(x=>x.iid==='$IID');process.stdout.write(b?b.spec:'')")
+          FIX=$(node -e "const b=require('./bench/instances.json').find(x=>x.iid==='$IID');process.stdout.write(b?b.fix_commit:'')")
+          test -n "$SPEC" || { echo "unknown bug $IID"; exit 1; }
+          echo "iid=$IID" >> "$GITHUB_OUTPUT"; echo "spec=$SPEC" >> "$GITHUB_OUTPUT"; echo "fix=$FIX" >> "$GITHUB_OUTPUT"
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Take the oracle spec from the human fix commit
+        run: |
+          git fetch --depth 1 https://github.com/Minds/front.git ${{ steps.bug.outputs.fix }}
+          git checkout FETCH_HEAD -- "${{ steps.bug.outputs.spec }}"
+      - name: Run the spec
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: npx ng test --watch=false --browsers=ChromeHeadlessCI --source-map=false --include="${{ steps.bug.outputs.spec }}"
