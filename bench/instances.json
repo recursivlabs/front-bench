@@ -1,0 +1,103 @@
+[
+ {
+  "iid": "2746",
+  "title": "Fix audio pause events triggering on component destroy front#6219",
+  "base": "f1e8f68baa0c",
+  "fix_commit": "479f86baf99fcdb3a5f0ca882e48b17a396c112d",
+  "files": [
+   "src/app/modules/media/components/audio/services/audio-player.service.ts"
+  ],
+  "spec": "src/app/modules/media/components/audio/services/audio-player.service.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nhttps://gitlab.com/minds/front/-/issues/6219\n\n### Summary of Changes\n\nFix audio pause events triggering on component destroy.\n\n### Testing Considerations\n\n1. Go to a feed with audio\n2. Go off the feed\n3. Check there are no events in Posthog (may be a delay)\n4. Go to a feed with audio\n5. Play and pause some audio\n6. Check the events appear in Posthog.\n\n### Deployment Considerations\n\nStandard deployment.\n\n### Regression Scope\n\n- Audio analytics. \n- Player pausing.\n\n### Platform Affected (web, mobile, etc)\n \u2026"
+ },
+ {
+  "iid": "2721",
+  "title": "Fix joining a group by invite when already on group page front#6202",
+  "base": "c52c269ca9cd",
+  "fix_commit": "29488cd629d92f9e039b6aae647bc4def15d32fd",
+  "files": [
+   "src/app/common/services/group-membership.service.ts"
+  ],
+  "spec": "src/app/common/services/group-membership.service.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nfront#6202\n\n### Summary of Changes\n\nFixes an issue wherein when a user is ALREADY on a group page, and accepts a group invite notification, the group does not automatically reload.\n\n### Testing Considerations\n\n- [x] When on a group page and accepting an invite to the same group, the group is reloaded, with me in a joined state.\n- [x] When on another page and accepting an invite, I am navigated to the group in a joined state.\n\n### Deployment Considerations\n\nStandard deployment.\n\n### Regression Scope\n\nGrou \u2026"
+ },
+ {
+  "iid": "2698",
+  "title": "Fix group invite form #6190",
+  "base": "4ba331e9a767",
+  "fix_commit": "47d0f0eef57e4fd6cf71019a74bbe193c5c49e85",
+  "files": [
+   "src/app/modules/groups/v2/invite/invite.component.ts"
+  ],
+  "spec": "src/app/modules/groups/v2/invite/invite.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nCloses https://gitlab.com/minds/front/-/issues/6190\n\n### Summary of Changes\n\nFix issue with group invite form preventing multiple members from being invited in a row.\n\n### Testing Considerations\n\n- [x] I can invite a user that I'm subscribed to by clicking their row from the search bar.\n- [x] I can invite a second user that I'm subscribed to by clicking their row from the search bar.\n- [x] I can invite a user that I'm subscribed to by typing their name into the search bar and clicking submit without clic \u2026"
+ },
+ {
+  "iid": "2696",
+  "title": "Fix Chatwoot emails minds#4948",
+  "base": "3c8f56a702df",
+  "fix_commit": "acddbd42905a98cd4ab9d470bdd342bbb1656430",
+  "files": [
+   "src/app/common/components/chatwoot-widget/chatwoot-widget.component.ts"
+  ],
+  "spec": "src/app/common/components/chatwoot-widget/chatwoot-widget.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nminds#4948\n\n### Summary of Changes\n\nFixes an issue where Chatwoot user held locally is out of sync with Chatwoot servers, by resetting the user if one is not set locally on bubble click.\n\n### Testing Considerations\n\nNote that email will NOT be passed to chatwoot if a user already exists with that email. I strongly recommend using plus addressing (e.g. example+chatwoot1@minds.com) to give your account a new email to test - and you can delete the contact from Chatwoot to retest.\n\nBetween tests you want to  \u2026"
+ },
+ {
+  "iid": "2735",
+  "title": "Fix incorrect site name in tenant forgot password flow #6209",
+  "base": "c7a590bf3c58",
+  "fix_commit": "ae01e6bb732251279a73cbf26200e92633ab7d84",
+  "files": [
+   "src/app/modules/auth/reset-password-modal/forms/request/request.component.ts"
+  ],
+  "spec": "src/app/modules/auth/reset-password-modal/forms/request/request.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\n#6209\n\n### Summary of Changes\n\nThe incorrect site name is used in the forgot password flow for Tenants. The text is hard-coded to be `Minds` when it should use the `site_name`.\n\n### Testing Considerations\n\nBound to https://fausto.oke.minds.io\n\n#### Tenant\n\n- [ ] After entering username in forgot password, the subsequent panel gives me the option to `Log in to {{tenant site name}}`.\n \n#### Non-tenant\n\n- [ ] After entering username in forgot password, the subsequent panel gives me the option to `Log in to  \u2026"
+ },
+ {
+  "iid": "2740",
+  "title": "Fix videos in modals starting muted #6215",
+  "base": "5420b630517a",
+  "fix_commit": "d9019b80068eb9934416e24681d6be003fd6b485",
+  "files": [
+   "src/app/modules/media/components/video-player/scrollaware-player.component.ts"
+  ],
+  "spec": "src/app/modules/media/components/video-player/scrollaware-player.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\n#6215\n\n### Summary of Changes\n\nWhen a video is opened in a modal, it was forcing the play of the video MUTED, when the autoplay setting was on.\nThis change will set it to unmuted when opened in a modal, with autoplay on.\n\n### Testing Considerations\n\n- [x] Autoplay ON; videos on SEPs open in a modal and autoplay and autoplay unmuted\n- [x] Autoplay ON; videos in narrow viewports open in a modal and autoplay unmuted \n- [x] Autoplay OFF; videos open in a modal, and upon pressing play are unmuted (this change \u2026"
+ },
+ {
+  "iid": "2741",
+  "title": "Fix audio og:image's front#6216",
+  "base": "5420b630517a",
+  "fix_commit": "c4423d09979468b4e666a50e227872cf1027e1ce",
+  "files": [
+   "src/app/modules/newsfeed/single/single.component.ts"
+  ],
+  "spec": "src/app/modules/newsfeed/single/single.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nfront#6216\n\n### Summary of Changes\n\nChange og:image for audio to be the audio thumbnail for an activity.\n\n### Testing Considerations\n\n- [x] With a thumbnail, og:image is the audio thumbnail.\n- [x] Without a thumbnail, og:image is the default audio thumbnail.\n\n### Deployment Considerations\n\nStandard deployment.\n\n### Regression Scope\n\nMinor, impacts audio SEP SEO.\n\n### Platform Affected (web, mobile, etc)\n\nWeb.\n\n### Developer Testing Completed\n\nManual, unit (jasmine / karma).\n\n### Screenshots / Screen Reco \u2026"
+ },
+ {
+  "iid": "2725",
+  "title": "Fix add card loop minds#5179",
+  "base": "4cb39d190eab",
+  "fix_commit": "7d55a9837f66394da353a2ae0d10bbce87823f6f",
+  "files": [
+   "src/app/modules/payments/new-card-modal/new-card-modal.component.ts",
+   "src/app/modules/payments/select-card/select-card.component.ts"
+  ],
+  "spec": "src/app/modules/payments/select-card/select-card.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\nminds#5179\n\n### Summary of Changes\n\nFix loop when adding new card where Stripe window keeps opening.\nAdditionally fixes issue where upon closing window to add a new card, the window was being automatically reopened.\n\n### Testing Considerations\n\nBound to https://olivia.oke.minds.io/\n\n- [x] When adding a new card, when you are back on Minds, the card is loaded in and Stripe does not reopen.\n- [x] When deciding not to add a new card on Stripe, when you are back on Minds, Stripe isn't automatically reopened. \u2026"
+ },
+ {
+  "iid": "2702",
+  "title": "[front] Fix upgrading when domain is misconfigured minds#5113",
+  "base": "d67c453047e3",
+  "fix_commit": "2319f2c4ce6b1e12c4d05a529d48e69e8967c7a8",
+  "files": [
+   "src/app/modules/about/product-pages/components/common/button/button.component.ts",
+   "src/app/modules/multi-tenant-network/admin-console/tabs/billing/billing.component.ts"
+  ],
+  "spec": "src/app/modules/about/product-pages/components/common/button/button.component.spec.ts",
+  "ticket": "<!---\nPlease read this!\n\nThe Definition of Done (DoD) can be found at https://developers.minds.com/docs/handbook/how-we-work/#definition-of-done\n--->\n\n### Ticket(s) / Related Merge Requests\n\n* Issue card: minds#5113\n* Engine MR: https://gitlab.com/minds/engine/-/merge_requests/1742\n\n### Summary of Changes\n\nSee engine MR."
+ }
+]
