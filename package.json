@@ -183,6 +183,6 @@
     "not IE 11"
   ],
   "overrides": {
-    "micro-bip32": "file:bench/vendor/scure-bip32-1.7.0.tgz"
+    "micro-bip32": "npm:@scure/bip32@1.7.0"
   }
 }
