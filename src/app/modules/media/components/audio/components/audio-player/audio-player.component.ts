@@ -26,7 +26,7 @@ import { AudioPlaybackState } from '../../types/audio-player.types';
 @Component({
   selector: 'm-audioPlayer',
   templateUrl: './audio-player.component.html',
-  styleUrl: './audio-player.component.ng.scss',
+  styleUrls: ['./audio-player.component.ng.scss'],
   imports: [AsyncPipe, AudioTimePipe, MatSliderModule, NgCommonModule],
   providers: [AudioPlayerService, AudioPlayerAnalyticsService],
   standalone: true,
