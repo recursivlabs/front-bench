@@ -10,7 +10,6 @@ import { ModalService } from '../../../../../services/ux/modal.service';
 
 import { ToasterService } from '../../../../../common/services/toaster.service';
 import { AboutModule } from '../../../../about/about.module';
-import { ConfigsService } from '../../../../../common/services/configs.service';
 import { ProductPagePricingService } from '../../../../about/product-pages/services/product-page-pricing.service';
 import { ProductPageUpgradeTimePeriod } from '../../../../about/product-pages/product-pages.types';
 import {
@@ -78,15 +77,12 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
 
   constructor(
     protected service: MultiTenantDomainService,
-    private configsService: ConfigsService,
     private pricingService: ProductPagePricingService,
     private tenantBillingGql: GetTenantBillingGQL,
     private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
-    const siteUrl = this.configsService.get('site_url');
-
     this.tenantBillingQueryRef = this.tenantBillingGql.watch();
 
     this.subscriptions = [
@@ -116,8 +112,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
                 'solid': true,
                 'rounded': null,
                 'navigationUrl':
-                  siteUrl +
-                  'api/v3/multi-tenant/billing/upgrade?plan=team&period=' +
+                  '/api/v3/multi-tenant/billing/upgrade?plan=team&period=' +
                   periodStr,
                 'stripeProductKey': 'networks:team',
                 'trialUpgradeRequest': null,
@@ -154,8 +149,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
                 'solid': true,
                 'rounded': null,
                 'navigationUrl':
-                  siteUrl +
-                  'api/v3/multi-tenant/billing/upgrade?plan=community&period=' +
+                  '/api/v3/multi-tenant/billing/upgrade?plan=community&period=' +
                   periodStr,
                 'stripeProductKey': 'networks:community',
                 'trialUpgradeRequest': null,
@@ -193,8 +187,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
                 'solid': true,
                 'rounded': null,
                 'navigationUrl':
-                  siteUrl +
-                  'api/v3/multi-tenant/billing/upgrade?plan=enterprise&period=' +
+                  '/api/v3/multi-tenant/billing/upgrade?plan=enterprise&period=' +
                   periodStr,
                 'stripeProductKey': 'networks:enterprise',
                 'trialUpgradeRequest': null,
