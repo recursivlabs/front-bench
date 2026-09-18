@@ -1,0 +1,167 @@
+--- src/app/modules/groups/v2/invite/invite.component.ts
++++ src/app/modules/groups/v2/invite/invite.component.ts
+@@ -10,6 +10,7 @@
+   UntypedFormBuilder,
+   UntypedFormGroup,
+   ValidationErrors,
+-  ValidatorFn,
+   Validators,
+ } from '@angular/forms';
+-import { Subscription, distinctUntilChanged, switchMap } from 'rxjs';
++import { Subscription, debounceTime, of, switchMap } from 'rxjs';
+ import { MindsGroup } from '../group.model';
++import { AutoCompleteEntityTypeEnum } from '../../../../common/components/forms/autocomplete-entity-input/autocomplete-entity-input.component';
++import { ToasterService } from '../../../../common/services/toaster.service';
+ 
+ /**
+@@ -32,6 +33,10 @@
+   providers: [GroupInviteService],
+ })
+ export class GroupInviteComponent implements OnInit, OnDestroy {
++  /** Enum for use in template. */
++  protected readonly AutoCompleteEntityTypeEnum: typeof AutoCompleteEntityTypeEnum =
++    AutoCompleteEntityTypeEnum;
++
+   /**
+    * Modal save handler
+    */
+@@ -62,40 +67,37 @@
+   constructor(
+     public service: GroupInviteService,
+     private fb: UntypedFormBuilder,
+-    private entityResolverService: EntityResolverService,
+-    private changeDetector: ChangeDetectorRef
++    private changeDetector: ChangeDetectorRef,
++    private toasterService: ToasterService,
++    private entityResolverService: EntityResolverService
+   ) {}
+ 
+   ngOnInit(): void {
+     this.formGroup = this.fb.group({
+-      username: [
++      user: [
+         '',
+         {
+           validators: [Validators.required],
+           updateOn: 'change',
+         },
+       ],
+     });
+ 
+     this.subscriptions.push(
+-      this.formGroup.controls.username.valueChanges
++      this.formGroup
++        .get('user')
++        .valueChanges.pipe(
+-          distinctUntilChanged(),
+-          switchMap((username: string) => {
+-            if (username === '') {
+-              this.invitee = null;
+-              this.refreshEligibilityValidator();
+-              return;
+-            } else {
+-              this.inProgress = true;
++          debounceTime(200),
++          switchMap((user: string | MindsUser) => {
++            // fallback for if the user does not click on the autocomplete result.
++            if (typeof user === 'string') {
+               let options = new EntityResolverServiceOptions();
+               options.refType = 'username';
+-              options.ref = username;
+-
++              options.ref = user;
+               return this.entityResolverService.get$<MindsUser>(options);
+             }
++            return of(user);
+           })
+         )
+-        .subscribe((user) => {
+-          this.inProgress = false;
++        .subscribe((user: MindsUser): void => {
++          if (!user) {
++            this.invitee = null;
++            return;
++          }
++          this.inProgress = false;
+           this.invitee = user;
+-          this.refreshEligibilityValidator();
+         })
+     );
+   }
+@@ -124,19 +126,23 @@
+    * Submit an invitation to the selected user
+    */
+   async onSubmit(): Promise<void> {
++    if (!this.invitee) {
++      console.error('No invitee selected');
++      return;
++    }
++
++    if (!this.invitee.subscriber) {
++      this.toasterService.error(
++        'You can only invite users who are subscribed to you'
++      );
++      return;
++    }
++
+     await this.service.invite(this.invitee);
+ 
+     // Reset the form
+     this.invitee = null;
+     this.formGroup.reset(
+       {
+-        username: '',
++        user: null,
+       },
+       {
+         emitEvent: false,
+       }
+     );
+-    this.formGroup.get('username').setErrors(null);
++    this.formGroup.get('user').setErrors(null);
+     this.formGroup.markAsPristine();
+     this.changeDetector.detectChanges();
+   }
+@@ -148,32 +154,4 @@
+   public isModerator(group: MindsGroup): boolean {
+     return group['is:owner'] || group['is:moderator'];
+   }
+-
+-  /**
+-   * Ensure we are not trying to invite someone who is not a subscriber
+-   */
+-  private eligibilityValidator(): ValidatorFn {
+-    return (control: AbstractControl): ValidationErrors | null => {
+-      if (this.invitee && !this.invitee.subscriber) {
+-        return {
+-          eligibilityInvalid: true,
+-        };
+-      }
+-    };
+-  }
+-
+-  private latestEligibilityValidator: ValidatorFn = null;
+-
+-  private refreshEligibilityValidator(): void {
+-    this.removeEligibilityValidator();
+-
+-    this.latestEligibilityValidator = this.eligibilityValidator();
+-    this.formGroup.controls.username?.addValidators(
+-      this.latestEligibilityValidator
+-    );
+-
+-    this.formGroup.controls.username?.updateValueAndValidity({
+-      emitEvent: false,
+-    });
+-
+-    this.formGroup.controls.username?.markAsDirty();
+-
+-    this.changeDetector.detectChanges();
+-  }
+-
+-  private removeEligibilityValidator(): void {
+-    this.formGroup.controls.username?.removeValidators(
+-      this.latestEligibilityValidator
+-    );
+-  }
+ }
