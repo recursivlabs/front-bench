@@ -12,6 +12,7 @@ import {
   ResetPasswordModalPanel,
   ResetPasswordModalService,
 } from '../../reset-password-modal.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 
 /**
  * Form for the user to submit a request for a
@@ -38,7 +39,8 @@ export class ResetPasswordModalRequestFormComponent
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
+    protected service: ResetPasswordModalService,
+    @Inject(SITE_NAME) private siteName: string
   ) {}
 
   ngOnInit(): void {
@@ -100,5 +102,13 @@ export class ResetPasswordModalRequestFormComponent
 
   get canSubmit(): boolean {
     return !this.inProgress && this.canSendEmail && this.form.valid;
+  }
+
+  /**
+   * Gets the text for the "Log In to Minds" link.
+   * Uses site name for tenants, defaults to "Minds".
+   */
+  get loginToText(): string {
+    return `to ${this.siteName}`;
   }
 }
