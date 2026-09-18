@@ -1,5 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ToasterService } from '../../../../../common/services/toaster.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 import {
   FormBuilder,
   FormControl,
@@ -38,7 +39,8 @@ export class ResetPasswordModalRequestFormComponent
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
+    protected service: ResetPasswordModalService,
+    @Inject(SITE_NAME) public siteName: string
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +98,10 @@ export class ResetPasswordModalRequestFormComponent
 
   openAuthModal($event): void {
     this.service.openAuthModal();
+  }
+
+  get loginToText(): string {
+    return $localize`:@@RESET_PASSWORD__EMAIL_SENT_PANEL__LOGIN_LINK__TO_MINDS:to ${this.siteName}`;
   }
 
   get canSubmit(): boolean {
