@@ -1,5 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ToasterService } from '../../../../../common/services/toaster.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 import {
   FormBuilder,
   FormControl,
@@ -38,8 +39,17 @@ export class ResetPasswordModalRequestFormComponent
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
+    protected service: ResetPasswordModalService,
+    @Inject(SITE_NAME) private siteName: string
   ) {}
+
+  /**
+   * Text prompting the user to log in to the site, using the correct
+   * site name (e.g. the tenant's site name rather than a hard-coded "Minds").
+   */
+  get loginToText(): string {
+    return $localize`:@@RESET_PASSWORD__EMAIL_SENT_PANEL__LOGIN_LINK__TO_SITE:to ${this.siteName}:siteName:`;
+  }
 
   ngOnInit(): void {
     // Always show the first panel on load
