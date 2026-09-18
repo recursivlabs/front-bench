@@ -1,0 +1,58 @@
+diff --git a/src/app/modules/about/product-pages/components/common/button/button.component.ts b/src/app/modules/about/product-pages/components/common/button/button.component.ts
+index 9ba309c5c..d0c906174 100644
+--- a/src/app/modules/about/product-pages/components/common/button/button.component.ts
++++ b/src/app/modules/about/product-pages/components/common/button/button.component.ts
+@@ -64,10 +64,17 @@ export class ProductPageButtonComponent {
+     this.inProgress = true;
+     // if there is a navigationUrl, navigate to it.
+     if (Boolean(this.data.navigationUrl)) {
+-      if (this.data.navigationUrl.startsWith('http')) {
++      if (
++        this.data.navigationUrl.startsWith('http') ||
++        this.data.navigationUrl.startsWith('/api/')
++      ) {
+         window.open(this.data.navigationUrl, '_blank');
+       } else {
+-        this.router.navigateByUrl(this.data.navigationUrl);
++        try {
++          await this.router.navigateByUrl(this.data.navigationUrl);
++        } catch (e: unknown) {
++          console.error(e);
++        }
+       }
+       this.inProgress = false;
+       return;
+diff --git a/src/app/modules/multi-tenant-network/admin-console/tabs/billing/billing.component.ts b/src/app/modules/multi-tenant-network/admin-console/tabs/billing/billing.component.ts
+index 64446ae79..f5870134f 100644
+--- a/src/app/modules/multi-tenant-network/admin-console/tabs/billing/billing.component.ts
++++ b/src/app/modules/multi-tenant-network/admin-console/tabs/billing/billing.component.ts
+@@ -116,8 +116,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
+                 'solid': true,
+                 'rounded': null,
+                 'navigationUrl':
+-                  siteUrl +
+-                  'api/v3/multi-tenant/billing/upgrade?plan=team&period=' +
++                  '/api/v3/multi-tenant/billing/upgrade?plan=team&period=' +
+                   periodStr,
+                 'stripeProductKey': 'networks:team',
+                 'trialUpgradeRequest': null,
+@@ -154,8 +153,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
+                 'solid': true,
+                 'rounded': null,
+                 'navigationUrl':
+-                  siteUrl +
+-                  'api/v3/multi-tenant/billing/upgrade?plan=community&period=' +
++                  '/api/v3/multi-tenant/billing/upgrade?plan=community&period=' +
+                   periodStr,
+                 'stripeProductKey': 'networks:community',
+                 'trialUpgradeRequest': null,
+@@ -193,8 +191,7 @@ export class NetworkAdminConsoleBillingComponent implements OnInit, OnDestroy {
+                 'solid': true,
+                 'rounded': null,
+                 'navigationUrl':
+-                  siteUrl +
+-                  'api/v3/multi-tenant/billing/upgrade?plan=enterprise&period=' +
++                  '/api/v3/multi-tenant/billing/upgrade?plan=enterprise&period=' +
+                   periodStr,
+                 'stripeProductKey': 'networks:enterprise',
+                 'trialUpgradeRequest': null,
