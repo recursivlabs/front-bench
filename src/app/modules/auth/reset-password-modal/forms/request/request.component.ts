@@ -12,6 +12,7 @@ import {
   ResetPasswordModalPanel,
   ResetPasswordModalService,
 } from '../../reset-password-modal.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 
 /**
  * Form for the user to submit a request for a
@@ -35,11 +36,20 @@ export class ResetPasswordModalRequestFormComponent
 
   protected secondsBetweenResends: number;
 
+  /**
+   * Text shown on the "Log In to {site}" link. Uses the site name rather
+   * than a hard-coded "Minds" so that tenants display their own site name.
+   */
+  protected readonly loginToText: string;
+
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
-  ) {}
+    protected service: ResetPasswordModalService,
+    @Inject(SITE_NAME) private readonly siteName: string
+  ) {
+    this.loginToText = $localize`:@@RESET_PASSWORD__EMAIL_SENT_PANEL__LOGIN_LINK__TO_SITE:to ${this.siteName}`;
+  }
 
   ngOnInit(): void {
     // Always show the first panel on load
