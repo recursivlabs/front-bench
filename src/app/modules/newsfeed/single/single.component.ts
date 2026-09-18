@@ -288,6 +288,8 @@ export class NewsfeedSingleComponent {
       thumbnailSrc =
         activity.custom_type === 'batch'
           ? activity.custom_data[0]['src']
+          : activity.custom_type === 'audio'
+          ? activity.custom_data['thumbnail_src']
           : activity.thumbnail_src;
 
       if (activity.site_membership && activity.paywall_thumbnail) {
