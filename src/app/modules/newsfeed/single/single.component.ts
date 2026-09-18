@@ -285,10 +285,17 @@ export class NewsfeedSingleComponent {
         description += `. `;
       }
 
-      thumbnailSrc =
-        activity.custom_type === 'batch'
-          ? activity.custom_data[0]['src']
-          : activity.thumbnail_src;
+      if (activity.custom_type === 'batch') {
+        thumbnailSrc = activity.custom_data[0]['src'];
+      } else if (activity.custom_type === 'audio') {
+        // For audio, use the audio thumbnail from custom_data,
+        // falling back to the default audio thumbnail.
+        thumbnailSrc =
+          activity.custom_data?.thumbnail_src ??
+          `${this.cdnAssetsUrl}assets/photos/audio.png`;
+      } else {
+        thumbnailSrc = activity.thumbnail_src;
+      }
 
       if (activity.site_membership && activity.paywall_thumbnail) {
         thumbnailSrc =
