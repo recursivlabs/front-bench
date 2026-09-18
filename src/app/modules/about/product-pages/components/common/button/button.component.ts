@@ -64,7 +64,14 @@ export class ProductPageButtonComponent {
     this.inProgress = true;
     // if there is a navigationUrl, navigate to it.
     if (Boolean(this.data.navigationUrl)) {
-      if (this.data.navigationUrl.startsWith('http')) {
+      if (
+        this.data.navigationUrl.startsWith('http') ||
+        this.data.navigationUrl.startsWith('/api/')
+      ) {
+        // Absolute URLs and server-side API endpoints (e.g. the multi-tenant
+        // billing upgrade endpoint) must trigger a full browser navigation
+        // rather than an in-app Angular route - otherwise upgrading breaks
+        // when the tenant domain is misconfigured.
         window.open(this.data.navigationUrl, '_blank');
       } else {
         this.router.navigateByUrl(this.data.navigationUrl);
