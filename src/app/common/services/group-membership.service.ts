@@ -166,12 +166,21 @@ export class GroupMembershipService implements OnDestroy {
                 );
               }
 
-              // only navigate if requested, and the user is not already on the page.
-              if (
-                groupJoinOptions?.navigateOnSuccess &&
-                !this.router.url.includes(`/group/${groupGuid}`)
-              ) {
-                this.router.navigateByUrl(`/group/${groupGuid}`);
+              // navigate to the group if requested.
+              if (groupJoinOptions?.navigateOnSuccess) {
+                const groupUrl = `/group/${groupGuid}`;
+
+                if (this.router.url.includes(groupUrl)) {
+                  // already on the group page - force a reload so the
+                  // group reflects the joined state.
+                  this.router
+                    .navigateByUrl('/', { skipLocationChange: true })
+                    .then(() => {
+                      this.router.navigateByUrl(groupUrl);
+                    });
+                } else {
+                  this.router.navigateByUrl(groupUrl);
+                }
               }
               return;
             }
