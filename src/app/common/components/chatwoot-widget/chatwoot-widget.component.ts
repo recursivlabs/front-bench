@@ -179,6 +179,10 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
   private async setUser(): Promise<void> {
     const user: MindsUser = this.session.getLoggedInUser();
 
+    if (!user) {
+      return;
+    }
+
     this.window.$chatwoot.setUser(user.guid, {
       name: `@${user.username}`,
       identifier_hash: await this.getIdentifierHash(),
@@ -205,7 +209,13 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
   private onBubbleClick(event: Event): void {
     const currentChatwootUser = this.window.$chatwoot?.user;
 
-    if (currentChatwootUser && !currentChatwootUser?.email) {
+    if (!currentChatwootUser) {
+      this.resetChatwoot();
+      this.patchEmail(); // async
+      return;
+    }
+
+    if (!currentChatwootUser?.email) {
       this.patchEmail(); // async
     }
   }
@@ -230,9 +240,15 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const currentChatwootUser = this.window.$chatwoot?.user;
+
     // patch user object.
     this.window.$chatwoot.setUser(loggedInUser.guid, {
-      ...this.window.$chatwoot.user,
+      ...(currentChatwootUser ?? {
+        name: `@${loggedInUser.username}`,
+        identifier_hash: await this.getIdentifierHash(),
+        avatar_url: this.userAvatar.getSrc(),
+      }),
       email: emailAddress,
     });
   }
