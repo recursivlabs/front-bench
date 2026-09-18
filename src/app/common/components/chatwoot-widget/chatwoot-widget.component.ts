@@ -174,16 +174,30 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
 
   /**
    * Sets user for widget.
+   * @param { boolean } includeEmail - whether to also set the users email address.
    * @returns { Promise<void> }
    */
-  private async setUser(): Promise<void> {
+  private async setUser(includeEmail: boolean = false): Promise<void> {
     const user: MindsUser = this.session.getLoggedInUser();
 
-    this.window.$chatwoot.setUser(user.guid, {
+    const userData: Record<string, unknown> = {
       name: `@${user.username}`,
       identifier_hash: await this.getIdentifierHash(),
       avatar_url: this.userAvatar.getSrc(),
-    });
+    };
+
+    if (includeEmail) {
+      const emailAddress: string =
+        await this.emailAddressService.getEmailAddress();
+
+      if (emailAddress) {
+        userData.email = emailAddress;
+      } else {
+        console.warn('No email found in settings');
+      }
+    }
+
+    this.window.$chatwoot.setUser(user.guid, userData);
   }
 
   /**
@@ -205,7 +219,18 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
   private onBubbleClick(event: Event): void {
     const currentChatwootUser = this.window.$chatwoot?.user;
 
-    if (currentChatwootUser && !currentChatwootUser?.email) {
+    if (!currentChatwootUser) {
+      // Local Chatwoot user is out of sync with the server (e.g. it was
+      // cleared server-side). Reset and re-establish the user with their email
+      // so that subsequent conversations are correctly attributed.
+      if (this.session.isLoggedIn()) {
+        this.resetChatwoot();
+        this.setUser(true); // async
+      }
+      return;
+    }
+
+    if (!currentChatwootUser?.email) {
       this.patchEmail(); // async
     }
   }
