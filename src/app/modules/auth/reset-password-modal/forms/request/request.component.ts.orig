@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ToasterService } from '../../../../../common/services/toaster.service';
 import {
   FormBuilder,
@@ -35,15 +35,16 @@ export class ResetPasswordModalRequestFormComponent
   protected canSendEmail: boolean = true;
 
   protected secondsBetweenResends: number;
-  protected readonly loginToText: string;
 
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
     protected service: ResetPasswordModalService,
-    @Inject(SITE_NAME) protected siteName: string
+    @Optional() @Inject(SITE_NAME) public siteName: string
   ) {
-    this.loginToText = $localize`:@@RESET_PASSWORD__EMAIL_SENT_PANEL__LOGIN_LINK__TO_SITE:to ${this.siteName || 'Minds'}:site name:`;
+    if (!this.siteName) {
+      this.siteName = 'Minds';
+    }
   }
 
   ngOnInit(): void {
@@ -101,6 +102,10 @@ export class ResetPasswordModalRequestFormComponent
 
   openAuthModal($event): void {
     this.service.openAuthModal();
+  }
+
+  get loginToText(): string {
+    return 'to ' + this.siteName;
   }
 
   get canSubmit(): boolean {

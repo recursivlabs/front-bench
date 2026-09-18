@@ -1,0 +1,38 @@
+--- src/app/modules/auth/reset-password-modal/forms/request/request.component.ts
++++ src/app/modules/auth/reset-password-modal/forms/request/request.component.ts
+@@ -1,4 +1,4 @@
+-import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
++import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+ import { ToasterService } from '../../../../../common/services/toaster.service';
+ import {
+   FormBuilder,
+@@ -31,15 +31,14 @@
+   protected canSendEmail: boolean = true;
+ 
+   protected secondsBetweenResends: number;
++  protected readonly loginToText: string;
+ 
+   constructor(
+     protected toaster: ToasterService,
+     private formBuilder: FormBuilder,
+     protected service: ResetPasswordModalService,
+-    @Optional() @Inject(SITE_NAME) public siteName: string
++    @Inject(SITE_NAME) protected siteName: string
+   ) {
+-    if (!this.siteName) {
+-      this.siteName = 'Minds';
+-    }
++    this.loginToText = $localize`:@@RESET_PASSWORD__EMAIL_SENT_PANEL__LOGIN_LINK__TO_SITE:to ${this.siteName || 'Minds'}:site name:`;
+   }
+ 
+@@ -103,10 +102,6 @@
+     this.service.openAuthModal();
+   }
+ 
+-  get loginToText(): string {
+-    return 'to ' + this.siteName;
+-  }
+-
+   get canSubmit(): boolean {
+     return !this.inProgress && this.canSendEmail && this.form.valid;
+   }
