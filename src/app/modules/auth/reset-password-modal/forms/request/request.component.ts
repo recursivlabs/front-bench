@@ -12,6 +12,7 @@ import {
   ResetPasswordModalPanel,
   ResetPasswordModalService,
 } from '../../reset-password-modal.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 
 /**
  * Form for the user to submit a request for a
@@ -35,10 +36,13 @@ export class ResetPasswordModalRequestFormComponent
 
   protected secondsBetweenResends: number;
 
+  protected loginToText: string;
+
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
+    protected service: ResetPasswordModalService,
+    @Inject(SITE_NAME) private siteName: string
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +62,7 @@ export class ResetPasswordModalRequestFormComponent
     );
 
     this.secondsBetweenResends = MIN_MS_BETWEEN_RESET_PASSWORD_EMAILS / 1000;
+    this.loginToText = 'to ' + this.siteName;
 
     this.buildForm();
   }
