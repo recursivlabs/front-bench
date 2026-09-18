@@ -95,10 +95,13 @@ export class AudioPlayerService {
   /**
    * Unregisters the audio player as the active player with the global service,
    * and pauses the audio.
+   * @param { boolean } trackEvent - Whether a user-facing pause event should be tracked.
    * @returns { AudioPlayerService }
    */
-  public onUnregisterActivePlayer(): AudioPlayerService {
-    this.pause();
+  public onUnregisterActivePlayer(
+    trackEvent: boolean = true
+  ): AudioPlayerService {
+    this.pause(trackEvent);
     this.loading$.next(false);
     this.isActivePlayer = false;
     return this;
@@ -125,7 +128,7 @@ export class AudioPlayerService {
     this.loading$.next(false);
     this.muted$.next(false);
     this.bufferedTime$.next(0);
-    this.onUnregisterActivePlayer();
+    this.onUnregisterActivePlayer(false);
   }
 
   /**
@@ -142,11 +145,19 @@ export class AudioPlayerService {
 
   /**
    * Pauses the audio.
+   * @param { boolean } trackEvent - Whether a user-facing pause event should be tracked.
    * @returns { void }
    */
-  public pause(): void {
+  public pause(trackEvent: boolean = true): void {
+    if (!this.isActivePlayer || !this.playing$.getValue()) {
+      return;
+    }
+
     this.globalAudioPlayerService.pause();
-    this.trackPauseEvent();
+
+    if (trackEvent) {
+      this.trackPauseEvent();
+    }
   }
 
   /**
