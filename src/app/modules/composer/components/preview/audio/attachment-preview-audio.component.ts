@@ -9,7 +9,7 @@ import { ToasterService } from '../../../../../common/services/toaster.service';
 @Component({
   selector: 'm-composerPreview--audio',
   templateUrl: './attachment-preview-audio.component.html',
-  styleUrl: './attachment-preview-audio.component.ng.scss',
+  styleUrls: ['./attachment-preview-audio.component.ng.scss'],
 })
 export class AttachmentPreviewAudioComponent implements OnInit {
   /** The thumbnail image file URL. */
