@@ -28,7 +28,7 @@ export class NewCardModalComponent implements OnInit {
    * @param onDismissIntent
    * @param defaults
    */
-  setModalData({ onComplete, onDismissIntent }) {
+  setModalData({ onComplete, onDismissIntent }: any): void {
     this.onComplete = onComplete || (() => {});
     this.onDismissIntent = onDismissIntent || (() => {});
   }
