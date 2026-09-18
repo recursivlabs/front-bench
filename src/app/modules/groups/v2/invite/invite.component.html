@@ -26,11 +26,14 @@
         <!------------------------>
         <div class="m-form__field--text stretchedField">
           <div class="m-form__row--input">
-            <m-formInput__autocompleteUserInput
-              id="username"
-              formControlName="username"
+            <m-formInput__autocompleteEntityInput
+              id="user"
+              name="user"
+              formControlName="user"
               placeholder="@username"
-            ></m-formInput__autocompleteUserInput>
+              entityType="user"
+              [allowEmpty]="true"
+            ></m-formInput__autocompleteEntityInput>
           </div>
         </div>
         <!-- Validation row is outside the row wrapper b/c of
@@ -40,7 +43,7 @@
             i18n="@@GROUP_INVITE__INVALID_INVITEE"
             *ngIf="
               !inProgress &&
-              formGroup.controls.username.errors?.eligibilityInvalid
+              formGroup.controls.user.errors?.eligibilityInvalid
             "
           >
             You can only invite users who are subscribed to you

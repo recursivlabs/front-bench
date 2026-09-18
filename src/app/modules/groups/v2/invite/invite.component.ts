@@ -19,8 +19,16 @@ import {
   EntityResolverService,
   EntityResolverServiceOptions,
 } from '../../../../common/services/entity-resolver.service';
-import { Subscription, distinctUntilChanged, switchMap } from 'rxjs';
+import {
+  Observable,
+  Subscription,
+  debounceTime,
+  distinctUntilChanged,
+  of,
+  switchMap,
+} from 'rxjs';
 import { MindsGroup } from '../group.model';
+import { ToasterService } from '../../../../common/services/toaster.service';
 
 /**
  * Invite modal component
@@ -68,12 +76,13 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     public service: GroupInviteService,
     private fb: UntypedFormBuilder,
     private entityResolverService: EntityResolverService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private toasterService: ToasterService
   ) {}
 
   ngOnInit(): void {
     this.formGroup = this.fb.group({
-      username: [
+      user: [
         '',
         {
           validators: [Validators.required],
@@ -83,25 +92,31 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.push(
-      this.formGroup.controls.username.valueChanges
+      this.formGroup.controls.user.valueChanges
         .pipe(
           distinctUntilChanged(),
-          switchMap((username: string) => {
-            if (username === '') {
+          debounceTime(200),
+          switchMap((user: string | MindsUser): Observable<MindsUser> => {
+            if (!user) {
               this.invitee = null;
               this.refreshEligibilityValidator();
-              return;
-            } else {
-              this.inProgress = true;
-              let options = new EntityResolverServiceOptions();
-              options.refType = 'username';
-              options.ref = username;
-
-              return this.entityResolverService.get$<MindsUser>(options);
+              return of(null);
             }
+
+            // If a full entity was already selected, use it directly.
+            if (typeof user !== 'string') {
+              return of(user);
+            }
+
+            this.inProgress = true;
+            let options = new EntityResolverServiceOptions();
+            options.refType = 'username';
+            options.ref = user;
+
+            return this.entityResolverService.get$<MindsUser>(options);
           })
         )
-        .subscribe((user) => {
+        .subscribe((user: MindsUser) => {
           this.inProgress = false;
           this.invitee = user;
           this.refreshEligibilityValidator();
@@ -136,19 +151,31 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
    * Submit an invitation to the selected user
    */
   async onSubmit(): Promise<void> {
+    if (!this.invitee) {
+      console.error('No invitee selected');
+      return;
+    }
+
+    if (!this.invitee.subscriber) {
+      this.toasterService.error(
+        'You can only invite users who are subscribed to you'
+      );
+      return;
+    }
+
     await this.service.invite(this.invitee);
 
     // Reset the form
     this.invitee = null;
     this.formGroup.reset(
       {
-        username: '',
+        user: null,
       },
       {
         emitEvent: false,
       }
     );
-    this.formGroup.get('username').setErrors(null);
+    this.formGroup.get('user').setErrors(null);
     this.formGroup.markAsPristine();
     this.changeDetector.detectChanges();
   }
@@ -181,21 +208,21 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     this.removeEligibilityValidator();
 
     this.latestEligibilityValidator = this.eligibilityValidator();
-    this.formGroup.controls.username?.addValidators(
+    this.formGroup.controls.user?.addValidators(
       this.latestEligibilityValidator
     );
 
-    this.formGroup.controls.username?.updateValueAndValidity({
+    this.formGroup.controls.user?.updateValueAndValidity({
       emitEvent: false,
     });
 
-    this.formGroup.controls.username?.markAsDirty();
+    this.formGroup.controls.user?.markAsDirty();
 
     this.changeDetector.detectChanges();
   }
 
   private removeEligibilityValidator(): void {
-    this.formGroup.controls.username?.removeValidators(
+    this.formGroup.controls.user?.removeValidators(
       this.latestEligibilityValidator
     );
   }
