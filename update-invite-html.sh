@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > src/app/modules/groups/v2/invite/invite.component.html
 <div
   class="m-modalV2__inner m-group__invite"
   *ngIf="service.group$ | async as group"
@@ -71,3 +72,4 @@
 </div>
 
 <m-modalCloseButton></m-modalCloseButton>
+INNER_EOF

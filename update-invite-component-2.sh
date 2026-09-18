@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > src/app/modules/groups/v2/invite/invite.component.ts
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -224,3 +225,4 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     );
   }
 }
+INNER_EOF
