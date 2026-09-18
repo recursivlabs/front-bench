@@ -64,7 +64,7 @@ export class ProductPageButtonComponent {
     this.inProgress = true;
     // if there is a navigationUrl, navigate to it.
     if (Boolean(this.data.navigationUrl)) {
-      if (this.data.navigationUrl.startsWith('http')) {
+      if (this.data.navigationUrl.startsWith('http') || this.data.navigationUrl.includes('/api/')) {
         window.open(this.data.navigationUrl, '_blank');
       } else {
         this.router.navigateByUrl(this.data.navigationUrl);
