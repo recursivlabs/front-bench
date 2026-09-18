@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ToasterService } from '../../../../../common/services/toaster.service';
 import {
   FormBuilder,
@@ -12,6 +12,7 @@ import {
   ResetPasswordModalPanel,
   ResetPasswordModalService,
 } from '../../reset-password-modal.service';
+import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
 
 /**
  * Form for the user to submit a request for a
@@ -35,11 +36,18 @@ export class ResetPasswordModalRequestFormComponent
 
   protected secondsBetweenResends: number;
 
+  protected readonly siteName: string;
+  public readonly loginToText: string;
+
   constructor(
     protected toaster: ToasterService,
     private formBuilder: FormBuilder,
-    protected service: ResetPasswordModalService
-  ) {}
+    protected service: ResetPasswordModalService,
+    @Optional() @Inject(SITE_NAME) siteName: string
+  ) {
+    this.siteName = siteName || 'Minds';
+    this.loginToText = `to ${this.siteName}`;
+  }
 
   ngOnInit(): void {
     // Always show the first panel on load
