@@ -1,0 +1,21 @@
+--- src/app/modules/auth/reset-password-modal/forms/request/request.component.spec.ts
++++ src/app/modules/auth/reset-password-modal/forms/request/request.component.spec.ts
+@@ -3,6 +3,7 @@
+ import { ResetPasswordModalRequestFormComponent } from './request.component';
+ import { ToasterService } from '../../../../../common/services/toaster.service';
+ import { MockService } from '../../../../../utils/mock';
++import { SITE_NAME } from '../../../../../common/injection-tokens/common-injection-tokens';
+ import {
+   ResetPasswordModalPanel,
+   ResetPasswordModalService,
+@@ -39,6 +40,10 @@
+             },
+           }),
+         },
++        {
++          provide: SITE_NAME,
++          useValue: 'Minds',
++        },
+       ],
+     }).compileComponents();
+ 
