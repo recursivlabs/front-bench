@@ -145,6 +145,10 @@ export class AudioPlayerService {
    * @returns { void }
    */
   public pause(): void {
+    if (!this.isActivePlayer || !this.playing$.getValue()) {
+      return;
+    }
+
     this.globalAudioPlayerService.pause();
     this.trackPauseEvent();
   }
