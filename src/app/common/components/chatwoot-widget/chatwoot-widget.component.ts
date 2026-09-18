@@ -174,15 +174,19 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
 
   /**
    * Sets user for widget.
+   * @param { { email?: string } } additionalProps - additional properties to set on the user.
    * @returns { Promise<void> }
    */
-  private async setUser(): Promise<void> {
+  private async setUser(
+    additionalProps: { email?: string } = {}
+  ): Promise<void> {
     const user: MindsUser = this.session.getLoggedInUser();
 
     this.window.$chatwoot.setUser(user.guid, {
       name: `@${user.username}`,
       identifier_hash: await this.getIdentifierHash(),
       avatar_url: this.userAvatar.getSrc(),
+      ...additionalProps,
     });
   }
 
@@ -200,12 +204,33 @@ export class ChatwootWidgetComponent implements OnInit, OnDestroy {
   /**
    * Handle clicks on Chatwoot bubble.
    * @param { Event } event - click event.
-   * @returns { void }
+   * @returns { Promise<void> }
    */
-  private onBubbleClick(event: Event): void {
+  private async onBubbleClick(event: Event): Promise<void> {
+    if (!this.session.isLoggedIn()) {
+      return;
+    }
+
     const currentChatwootUser = this.window.$chatwoot?.user;
 
-    if (currentChatwootUser && !currentChatwootUser?.email) {
+    if (!currentChatwootUser) {
+      // Clear any lingering state as it's gotten out of sync.
+      this.resetChatwoot();
+
+      const email: string = await this.emailAddressService.getEmailAddress();
+
+      if (!email) {
+        console.warn('No email found in settings');
+        await this.setUser();
+        return;
+      }
+
+      // Set the user again with the email address.
+      await this.setUser({ email });
+      return;
+    }
+
+    if (!currentChatwootUser?.email) {
       this.patchEmail(); // async
     }
   }
