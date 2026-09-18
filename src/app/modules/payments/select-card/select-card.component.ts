@@ -108,9 +108,19 @@ export class PaymentsSelectCard {
     const modal = this.modalService.present(NewCardModalComponent, {
       data: {
         onComplete: () => {
+          // Reset the selection so the dropdown no longer holds the
+          // "new" option, preventing the modal from reopening in a loop.
+          this.paymentMethodId = '';
           this.selected.next('');
           this.loadCards();
-          modal.close();
+          modal?.close();
+        },
+        onDismissIntent: () => {
+          // When the user backs out without adding a card, reset the
+          // selection and close so Stripe isn't automatically reopened.
+          this.paymentMethodId = '';
+          this.selected.next('');
+          modal?.close();
         },
       },
     });
