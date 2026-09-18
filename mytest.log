@@ -1,0 +1,16 @@
+One or more browsers which are configured in the project's Browserslist configuration will be ignored as ES5 output is not supported by the Angular CLI.
+Ignored browsers: kaios 2.5, op_mini all
+- Generating browser application bundles (phase: setup)...
+✔ Browser application bundle generation complete.
+
+START:
+18 09 2026 15:51:09.302:INFO [karma-server]: Karma v6.4.1 server started at http://localhost:9876/
+18 09 2026 15:51:09.305:INFO [launcher]: Launching browsers ChromeHeadlessCI with concurrency unlimited
+18 09 2026 15:51:09.309:INFO [launcher]: Starting browser ChromeHeadless
+18 09 2026 15:51:09.310:ERROR [launcher]: No binary for ChromeHeadless browser on your platform.
+  Please, set "CHROME_BIN" env variable.
+
+Finished in 0 secs / 0 secs @ 15:51:09 GMT+0000 (Coordinated Universal Time)
+
+✔ Browser application bundle generation complete.
+✔ Browser application bundle generation complete.
