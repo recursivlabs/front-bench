@@ -1,0 +1,37 @@
+--- src/app/modules/payments/new-card-modal/new-card-modal.component.ts
++++ src/app/modules/payments/new-card-modal/new-card-modal.component.ts
+@@ -23,12 +23,10 @@
+ 
+   /**
+    * Modal options
+-   *
+-   * @param onComplete
+-   * @param onDismissIntent
+-   * @param defaults
++   * @param { any } opts - modal options.
++   * @returns { void }
+    */
+-  setModalData({ onComplete, onDismissIntent }) {
++  setModalData({ onComplete, onDismissIntent }: any): void {
+     this.onComplete = onComplete || (() => {});
+     this.onDismissIntent = onDismissIntent || (() => {});
+   }
+--- src/app/modules/payments/select-card/select-card.component.ts
++++ src/app/modules/payments/select-card/select-card.component.ts
+@@ -107,9 +107,14 @@
+     const modal = this.modalService.present(NewCardModalComponent, {
+       data: {
+         onComplete: () => {
++          this.paymentMethodId = '';
+           this.selected.next('');
+           this.loadCards();
+-          modal.close();
++          modal?.close();
++        },
++        onDismissIntent: () => {
++          this.paymentMethodId = '';
++          this.selected.next('');
++          modal?.close();
+         },
+       },
+     });
