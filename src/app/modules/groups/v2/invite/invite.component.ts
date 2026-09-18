@@ -4,23 +4,19 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  Optional,
 } from '@angular/core';
 import { GroupInviteService } from './invite.service';
 import { MindsUser } from '../../../../interfaces/entities';
 import {
-  AbstractControl,
   UntypedFormBuilder,
   UntypedFormGroup,
-  ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
-import {
-  EntityResolverService,
-  EntityResolverServiceOptions,
-} from '../../../../common/services/entity-resolver.service';
-import { Subscription, distinctUntilChanged, switchMap } from 'rxjs';
+import { EntityResolverService, EntityResolverServiceOptions } from '../../../../common/services/entity-resolver.service';
+import { of, Subscription, switchMap } from 'rxjs';
 import { MindsGroup } from '../group.model';
+import { ToasterService } from '../../../../common/services/toaster.service';
 
 /**
  * Invite modal component
@@ -68,12 +64,13 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     public service: GroupInviteService,
     private fb: UntypedFormBuilder,
     private entityResolverService: EntityResolverService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    @Optional() private toasterService: ToasterService
   ) {}
 
   ngOnInit(): void {
     this.formGroup = this.fb.group({
-      username: [
+      user: [
         '',
         {
           validators: [Validators.required],
@@ -83,28 +80,34 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.push(
-      this.formGroup.controls.username.valueChanges
-        .pipe(
-          distinctUntilChanged(),
-          switchMap((username: string) => {
-            if (username === '') {
-              this.invitee = null;
-              this.refreshEligibilityValidator();
-              return;
-            } else {
-              this.inProgress = true;
-              let options = new EntityResolverServiceOptions();
-              options.refType = 'username';
-              options.ref = username;
-
-              return this.entityResolverService.get$<MindsUser>(options);
+      this.formGroup
+        .get('user')
+        .valueChanges.pipe(
+          switchMap((user: string | MindsUser) => {
+            if (!user) {
+              this.inProgress = false;
+              return of(null);
             }
+
+            // If the autocomplete emits a hydrated entity, use it directly.
+            if (typeof user !== 'string') {
+              this.inProgress = false;
+              return of(user);
+            }
+
+            // Fallback for typed usernames submitted without clicking a result.
+            this.inProgress = true;
+            let options = new EntityResolverServiceOptions();
+            options.refType = 'username';
+            options.ref = user;
+
+            return this.entityResolverService.get$<MindsUser>(options);
           })
         )
-        .subscribe((user) => {
+        .subscribe((user: MindsUser) => {
           this.inProgress = false;
-          this.invitee = user;
-          this.refreshEligibilityValidator();
+          this.invitee = user || null;
+          this.changeDetector.detectChanges();
         })
     );
   }
@@ -136,19 +139,31 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
    * Submit an invitation to the selected user
    */
   async onSubmit(): Promise<void> {
+    if (!this.invitee) {
+      console.error('No invitee selected');
+      return;
+    }
+
+    if (!this.invitee.subscriber) {
+      this.toasterService?.error(
+        'You can only invite users who are subscribed to you'
+      );
+      return;
+    }
+
     await this.service.invite(this.invitee);
 
     // Reset the form
     this.invitee = null;
     this.formGroup.reset(
       {
-        username: '',
+        user: null,
       },
       {
         emitEvent: false,
       }
     );
-    this.formGroup.get('username').setErrors(null);
+    this.formGroup.get('user').setErrors(null);
     this.formGroup.markAsPristine();
     this.changeDetector.detectChanges();
   }
@@ -160,43 +175,5 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
    */
   public isModerator(group: MindsGroup): boolean {
     return group['is:owner'] || group['is:moderator'];
-  }
-
-  /**
-   * Ensure we are not trying to invite someone who is not a subscriber
-   */
-  private eligibilityValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (this.invitee && !this.invitee.subscriber) {
-        return {
-          eligibilityInvalid: true,
-        };
-      }
-    };
-  }
-
-  private latestEligibilityValidator: ValidatorFn = null;
-
-  private refreshEligibilityValidator(): void {
-    this.removeEligibilityValidator();
-
-    this.latestEligibilityValidator = this.eligibilityValidator();
-    this.formGroup.controls.username?.addValidators(
-      this.latestEligibilityValidator
-    );
-
-    this.formGroup.controls.username?.updateValueAndValidity({
-      emitEvent: false,
-    });
-
-    this.formGroup.controls.username?.markAsDirty();
-
-    this.changeDetector.detectChanges();
-  }
-
-  private removeEligibilityValidator(): void {
-    this.formGroup.controls.username?.removeValidators(
-      this.latestEligibilityValidator
-    );
   }
 }
