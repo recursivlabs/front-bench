@@ -86,7 +86,11 @@ export class PaymentsSelectCard {
       // if user has enough Boost credits, select gift card payment.
       this.selected.next((this.paymentMethodId = 'gift_card'));
     } else {
-      if (this.paymentMethodId && this.paymentMethodId !== 'gift_card') {
+      if (
+        this.paymentMethodId &&
+        this.paymentMethodId !== 'gift_card' &&
+        this.paymentMethodId !== 'new'
+      ) {
         // if user has a selected payment method already, select it.
         this.selected.next(this.paymentMethodId);
       } else if (paymentmethods && paymentmethods.length) {
@@ -108,12 +112,29 @@ export class PaymentsSelectCard {
     const modal = this.modalService.present(NewCardModalComponent, {
       data: {
         onComplete: () => {
+          this.paymentMethodId = '';
           this.selected.next('');
           this.loadCards();
           modal.close();
         },
-      },
+        onDismissIntent: () => {
+          this.paymentMethodId = '';
+          this.selected.next('');
+          this.loadCards();
+          modal.close();
+        },
+      } as any,
     });
+
+    try {
+      await modal.result;
+    } catch (e) {}
+
+    if (this.paymentMethodId === 'new') {
+      this.paymentMethodId = '';
+      this.selected.next('');
+      this.loadCards();
+    }
   }
 
   detectChanges() {
