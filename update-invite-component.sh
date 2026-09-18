@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > src/app/modules/groups/v2/invite/invite.component.ts
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -22,7 +23,6 @@ import {
 import { Subscription, distinctUntilChanged, switchMap, of, debounceTime } from 'rxjs';
 import { MindsGroup } from '../group.model';
 import { AutoCompleteEntityTypeEnum } from '../../../../common/components/forms/autocomplete-entity-input/autocomplete-entity-input.component';
-import { ToasterService } from '../../../../common/services/toaster.service';
 
 /**
  * Invite modal component
@@ -73,8 +73,7 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     public service: GroupInviteService,
     private fb: UntypedFormBuilder,
     private entityResolverService: EntityResolverService,
-    private changeDetector: ChangeDetectorRef,
-    private toasterService: ToasterService
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -147,18 +146,6 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
    * Submit an invitation to the selected user
    */
   async onSubmit(): Promise<void> {
-    if (!this.invitee) {
-      console.error('No invitee selected');
-      return;
-    }
-
-    if (!this.invitee.subscriber) {
-      this.toasterService.error(
-        'You can only invite users who are subscribed to you'
-      );
-      return;
-    }
-
     await this.service.invite(this.invitee);
 
     // Reset the form
@@ -224,3 +211,4 @@ export class GroupInviteComponent implements OnInit, OnDestroy {
     );
   }
 }
+INNER_EOF
